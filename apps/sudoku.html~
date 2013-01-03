@@ -50,11 +50,9 @@
 		 	</div>
 		 	<div class="span1">		 		
 		 		<div class="row-fluid">		 
-		 			<button class="btn btn-inverse btn-block" ng-click="init()"><i class="icon-repeat"></i> Init</button>	
-		 			<button class="btn btn-danger btn-block" ng-click="generate()"><i class="icon-random"></i> New</button>	 			
-		 			<button class="btn btn-success btn-block" ng-click="solve()"><i class="icon-ok-sign"></i> Solve</button>		 			
-		 			<button class="btn btn-primary btn-block" ng-click="clear()"><i class="icon-off"></i> Clear</button>
-		 			<a class="btn  btn-info btn-block" href="https://github.com/mouradmourafiq/angular_sudoku">fork me!</a>		 			
+		 			<button class="btn btn-inverse btn-block" ng-click="init()"><i class="icon-repeat"></i> Init</button>		 			
+		 			<button class="btn btn-success btn-block" ng-click="solve()"><i class="icon-ok-sign"></i> Solve</button>
+		 			<button class="btn btn-primary btn-block" ng-click="clear()"><i class="icon-off"></i> Clear</button>		 			
 		 		</div>		 		
 		 	</div>
 		 </div>			

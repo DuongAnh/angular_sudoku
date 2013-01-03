@@ -262,7 +262,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
 	return [true, stats];  	
     }
     
-    function solve_rows(rows){
+	function solve_rows(rows){
     	var stat1 = true;
 		var stat2 = true;
 		while(stat1){
@@ -298,12 +298,11 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
 				}								
 			}
 		}		
-		if(is_solved(rows)){
-			$scope.rows = jQuery.extend(true, [], rows);
-			return true;
+		if(is_solved(rows)){			
+			return {'stat':true, 'rows':jQuery.extend(true, [], rows)};
 		}
 		return random_solving(rows);
-		return false;
+		return {'stat' :false, 'rows':''};	
     }
     
     function random_solving(rows){
@@ -316,9 +315,9 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
     					r_clone = jQuery.extend(true, [], rows);
     					var r = Math.floor((Math.random()*10)+1)%nbr_pos;    					    				
     					r_clone[l].columns[c].value = r_clone[l].columns[c].possibilities[r]
-    					if(solve_rows(r_clone)){
-					   		$scope.rows = jQuery.extend(true, [], r_clone);
-					   		return true ;
+    					results = solve_rows(r_clone);
+    					if(results['stat']){					   		
+					   		return {'stat':true, 'rows':jQuery.extend(true, [], results['rows'])};
 					   	}  
 					   	else{
 				   			r_clone[l].columns[c].possibilities.splice(r,1);
@@ -326,7 +325,7 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
 				   		}    					
     				}
     			}
-    	return false;		
+    	return {'stat' :false, 'rows':''};		
     }
     
 	$scope.get_value = function(value, row_id, column_id) {		
@@ -349,7 +348,68 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
 	$scope.clear = function() {		
 		$scope.rows = jQuery.extend(true, [], $scope.rows_clear);
 	}
+
+	function gen_rand_list(nbr_rands){
+		rand_list = []
+		while(rand_list.length < nbr_rands){
+			rand_i = Math.ceil(Math.random()*9) - 1;
+			if (rand_list.indexOf(rand_i) === -1){
+				rand_list.push(rand_i);
+			}
+		}		
+		return rand_list;
+	}
 	
+	$scope.generate = function() {		
+		var rows = jQuery.extend(true, [], $scope.rows_clear);
+		var results = solve_rows(rows);
+		if(results['stat']){
+			alert("creating new grid");			
+			rows = jQuery.extend(true, [], results['rows']);
+			for (var l=0; l<9; l++){
+				for(var c=0; c<9; c++){				
+					rows[l].columns[c].class = "correct";				
+				}
+			}
+			//first we generate a sequence of the lines [1,2, 3, ..., 9]
+			rand_squares = gen_rand_list(9);				
+			//delete 8 values from 3 lines
+			for (var l=0; l<3; l++){
+				rand_indices = gen_rand_list(8);				
+				for (var c=0; c<8; c++){
+					rows[rand_squares[l]].columns[rand_indices[c]].class = "";
+					rows[rand_squares[l]].columns[rand_indices[c]].value = "";					
+				}
+			}
+			//delete 6 values from 2 lines
+			for (var l=3; l<5; l++){
+				rand_indices = gen_rand_list(6);
+				for (var c=0; c<6; c++){
+					rows[rand_squares[l]].columns[rand_indices[c]].class = "";
+					rows[rand_squares[l]].columns[rand_indices[c]].value = "";
+				}
+			}
+			//delete 4 values from 2 lines
+			for (var l=5; l<7; l++){
+				rand_indices = gen_rand_list(4);
+				for (var c=0; c<4; c++){
+					rows[rand_squares[l]].columns[rand_indices[c]].class = "";
+					rows[rand_squares[l]].columns[rand_indices[c]].value = "";
+				}
+			}
+			//delete 3 values from 2 square
+			for (var l=7; l<9; l++){
+				rand_indices = gen_rand_list(3);
+				for (var c=0; c<3; c++){
+					rows[rand_squares[l]].columns[rand_indices[c]].class = "";
+					rows[rand_squares[l]].columns[rand_indices[c]].value = "";
+				}
+			}			
+		}
+		$scope.rows_save = jQuery.extend(true, [], rows);
+		$scope.rows = jQuery.extend(true, [], rows);						
+	}	
+
 	$scope.check = function(row_id, column_id) {			
 		row_id = row_id - 1;
 		column_id = column_id - 1;		
@@ -402,7 +462,9 @@ Sudoku.controller('SudokuController', function SudokuController($scope, $http) {
 	};
 	
 	$scope.solve = function() {
-		if(solve_rows($scope.rows)){
+		results = solve_rows($scope.rows);
+		if(results['stat']){
+			$scope.rows = jQuery.extend(true, [], results['rows']);
 			alert("solved");			
 		}
 		else
